@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Grafik Rodzinny</title>
+<meta name="app-build" content="v11">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="theme-color" content="#111827">
@@ -173,8 +174,11 @@ async function syncFromCloud(){
     const j=await r.json();
     if(j && j.ok && j.data && typeof j.data==="object"){
       if(j.data.overrides && typeof j.data.overrides==="object"){
-        overrides=j.data.overrides;
-        notes=(j.data.notes && typeof j.data.notes==="object")?j.data.notes:{};
+        const cloudOverrides=j.data.overrides;
+        const cloudNotes=(j.data.notes && typeof j.data.notes==="object")?j.data.notes:{};
+        const localNotes=(notes && typeof notes==="object")?notes:{};
+        overrides=cloudOverrides;
+        notes=Object.keys(cloudNotes).length ? cloudNotes : localNotes;
       } else {
         // Backward compatibility with the old cloud format.
         overrides=j.data;
@@ -251,26 +255,76 @@ function escapeHtml(v){
 }
 function renderSummary(){
   const y=cur.getFullYear(),m=cur.getMonth();
-  document.getElementById("summaryMonth").textContent=`— ${M[m]} ${y}`;
+  const monthEl=document.getElementById("summaryMonth");
+  const grid=document.getElementById("summaryGrid");
+  const list=document.getElementById("eventsList");
+  if(monthEl) monthEl.textContent=`— ${M[m]} ${y}`;
+
   const totals={Tomasz:{shifts:0,hours:0},Natalia:{shifts:0,hours:0},Kuba:{shifts:0,hours:0}};
   const last=new Date(y,m+1,0).getDate();
+
   for(let d=1;d<=last;d++){
-    getPeople(isoOf(y,m,d)).forEach(([name,h])=>{
-      if(totals[name]){totals[name].shifts++;totals[name].hours+=shiftHours(h);}
+    const iso=isoOf(y,m,d);
+    const dayPeople=getPeople(iso)||[];
+    dayPeople.forEach(item=>{
+      const name=item[0], range=item[1];
+      if(totals[name]){
+        totals[name].shifts++;
+        totals[name].hours+=shiftHours(range);
+      }
     });
   }
-  document.getElementById("summaryGrid").innerHTML=people.map(name=>{
-    const t=totals[name],h=Number.isInteger(t.hours)?t.hours:t.hours.toFixed(1);
-    return `<div class="summary-person"><div class="name ${cls[name]}">${name}</div><div class="stats">${t.shifts} ${t.shifts===1?"zmiana":"zmian"} · ${h} h</div></div>`;
-  }).join("");
 
-  const prefix=`${y}-${String(m+1).padStart(2,"0")}-`;
-  const dates=Object.keys(notes).filter(x=>x.startsWith(prefix)).sort();
-  const list=document.getElementById("eventsList");
-  list.innerHTML=dates.length ? dates.map(iso=>{
-    const day=iso.slice(8,10);
-    return `<div class="event-item" onclick="openDay('${iso}')"><div class="event-date">${day}.${String(m+1).padStart(2,"0")}</div><div class="event-icon">📝</div><div class="event-text">${escapeHtml(notes[iso])}</div></div>`;
-  }).join("") : '<div class="event-empty">Brak zapisanych notatek i wydarzeń w tym miesiącu.</div>';
+  if(grid){
+    grid.innerHTML="";
+    people.forEach(name=>{
+      const t=totals[name];
+      const card=document.createElement("div");
+      card.className="summary-person";
+      const nm=document.createElement("div");
+      nm.className="name";
+      nm.textContent=name;
+      nm.style.background= name==="Tomasz" ? "var(--blue)" : name==="Natalia" ? "var(--green)" : "var(--yellow)";
+      nm.style.color= name==="Kuba" ? "#111" : "#fff";
+      nm.style.borderRadius="7px";
+      nm.style.padding="4px 6px";
+      const st=document.createElement("div");
+      st.className="stats";
+      st.textContent=`${t.shifts} ${t.shifts===1?"zmiana":"zmian"} · ${t.hours} h`;
+      card.appendChild(nm);
+      card.appendChild(st);
+      grid.appendChild(card);
+    });
+  }
+
+  if(list){
+    const prefix=`${y}-${String(m+1).padStart(2,"0")}-`;
+    const noteObj=(notes && typeof notes==="object" && !Array.isArray(notes))?notes:{};
+    const dates=Object.keys(noteObj).filter(x=>x.startsWith(prefix)).sort();
+    list.innerHTML="";
+    if(!dates.length){
+      list.innerHTML='<div class="event-empty">Brak zapisanych notatek i wydarzeń w tym miesiącu.</div>';
+    } else {
+      dates.forEach(iso=>{
+        const item=document.createElement("div");
+        item.className="event-item";
+        item.onclick=()=>openDay(iso);
+        const date=document.createElement("div");
+        date.className="event-date";
+        date.textContent=iso.slice(8,10)+"."+String(m+1).padStart(2,"0");
+        const icon=document.createElement("div");
+        icon.className="event-icon";
+        icon.textContent="📝";
+        const text=document.createElement("div");
+        text.className="event-text";
+        text.textContent=noteObj[iso];
+        item.appendChild(date);
+        item.appendChild(icon);
+        item.appendChild(text);
+        list.appendChild(item);
+      });
+    }
+  }
 }
 function move(n){cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);render();}
 function goToday(){const t=new Date();cur=new Date(t.getFullYear(),t.getMonth(),1);render();showToast("Przejście do bieżącego miesiąca");}
@@ -298,6 +352,7 @@ function openDay(iso){
     </div>`;
    editors.appendChild(box);
  });
+ document.getElementById("dayNote").value=notes[iso]||"";
  document.getElementById("overlay").classList.add("show");
 }
 function savePerson(name){
