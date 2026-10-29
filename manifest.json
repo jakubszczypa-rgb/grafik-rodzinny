@@ -1,0 +1,10 @@
+{
+  "name": "Grafik Rodzinny",
+  "short_name": "Grafik",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#111827",
+  "lang": "pl",
+  "icons": []
+}
