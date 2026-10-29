@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Grafik Rodzinny</title>
-<meta name="app-build" content="v12">
+<meta name="app-build" content="v13">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="theme-color" content="#111827">
@@ -394,7 +394,20 @@ async function setupSync(){
 }
 render();
 if(CONFIG.SYNC_URL) setTimeout(()=>syncFromCloud().catch(()=>{}),700);
-if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+if("serviceWorker" in navigator){
+  window.addEventListener("load", async ()=>{
+    try{
+      const reg=await navigator.serviceWorker.register("./sw.js");
+      reg.update().catch(()=>{});
+      navigator.serviceWorker.addEventListener("controllerchange",()=>{
+        if(!sessionStorage.getItem("grafik-sw-refreshed")){
+          sessionStorage.setItem("grafik-sw-refreshed","1");
+          window.location.reload();
+        }
+      });
+    }catch(_){}
+  });
+}
 </script>
 </body>
 </html>
