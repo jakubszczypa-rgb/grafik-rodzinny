@@ -158,7 +158,7 @@ const baseData={
 }};
 
 const STORAGE="grafikRodzinnyOverridesV3";
-const CONFIG={SYNC_URL:localStorage.getItem("grafikSyncUrl")||""};
+const CONFIG={SYNC_URL:localStorage.getItem("grafikSyncUrl")||DEFAULT_SYNC_URL};
 let overrides=JSON.parse(localStorage.getItem(STORAGE)||"{}");
 let cur=new Date(2026,10,1);
 let editingIso=null;
