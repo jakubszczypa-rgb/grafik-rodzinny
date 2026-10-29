@@ -82,6 +82,7 @@ select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;ba
       <h1>📅 Grafik Rodzinny</h1>
       <div class="actions">
         <button class="today-btn" onclick="goToday()">Dzisiaj</button>
+        <button class="icon-btn" title="Synchronizacja" onclick="setupSync()">☁️</button>
       </div>
     </div>
     <div class="month-row">
@@ -109,6 +110,8 @@ select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;ba
 <div id="toast" class="toast"></div>
 
 <script>
+// Cloud sync URL configured for the family calendar.
+const DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbz--edLoOYJdkp5KV1hyMTna5cqFqFpB_B7DLo6w13Vq5ZcUzNP0hBmc3_4MAN5D5Nn/exec';
 const M=["STYCZEŃ","LUTY","MARZEC","KWIECIEŃ","MAJ","CZERWIEC","LIPIEC","SIERPIEŃ","WRZESIEŃ","PAŹDZIERNIK","LISTOPAD","GRUDZIEŃ"];
 const W=["PN","WT","ŚR","CZ","PT","SB","ND"];
 const people=["Tomasz","Natalia","Kuba"];
@@ -154,10 +157,13 @@ const baseData={
 "30":[["Tomasz","06:00–14:00"],["Natalia","07:00–19:00"]]
 }};
 
-const STORAGE="grafikRodzinnyOverridesV2";
+const STORAGE="grafikRodzinnyOverridesV3";
+const CONFIG={SYNC_URL:localStorage.getItem("grafikSyncUrl")||""};
 let overrides=JSON.parse(localStorage.getItem(STORAGE)||"{}");
 let cur=new Date(2026,10,1);
 let editingIso=null;
+let syncTimer=null;
+let syncBusy=false;
 
 function isoOf(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
 function getNataliaForDate(date){
@@ -176,7 +182,37 @@ function getPeople(iso){
   if(Object.prototype.hasOwnProperty.call(overrides,iso)) return overrides[iso];
   return getBasePeople(iso);
 }
-function saveOverrides(){localStorage.setItem(STORAGE,JSON.stringify(overrides));}
+function saveOverrides(){localStorage.setItem(STORAGE,JSON.stringify(overrides)); queueCloudSync();}
+async function syncFromCloud(){
+  if(!CONFIG.SYNC_URL || syncBusy) return;
+  syncBusy=true;
+  try{
+    const r=await fetch(CONFIG.SYNC_URL+"?action=get", {cache:"no-store"});
+    if(!r.ok) throw new Error("sync get failed");
+    const j=await r.json();
+    if(j && j.ok && j.data && typeof j.data==="object"){
+      overrides=j.data;
+      saveOverrides();
+      render();
+    }
+  }catch(e){ console.warn("Cloud sync read:",e); }
+  finally{syncBusy=false;}
+}
+async function syncToCloud(){
+  if(!CONFIG.SYNC_URL) return;
+  try{
+    await fetch(CONFIG.SYNC_URL, {
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"set",data:overrides})
+    });
+  }catch(e){ console.warn("Cloud sync write:",e); }
+}
+function queueCloudSync(){
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(syncToCloud,250);
+}
 function render(){
  const y=cur.getFullYear(),m=cur.getMonth();
  document.getElementById("month").textContent=`${M[m]} ${y}`;
@@ -248,7 +284,20 @@ function deletePerson(name){
 function closeSheet(){document.getElementById("overlay").classList.remove("show");editingIso=null;}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),1600);}
 
+async function setupSync(){
+  const current=CONFIG.SYNC_URL||"";
+  const url=prompt("Wklej adres Web App z Google Apps Script (zaczyna się od https://script.google.com/macros/s/)",current);
+  if(url===null) return;
+  const clean=url.trim().replace(/\\/$/,"");
+  if(!clean){ localStorage.removeItem("grafikSyncUrl"); CONFIG.SYNC_URL=""; showToast("Synchronizacja wyłączona"); return; }
+  CONFIG.SYNC_URL=clean; localStorage.setItem("grafikSyncUrl",clean);
+  showToast("Łączenie z chmurą…");
+  await syncFromCloud();
+  await syncToCloud();
+  showToast("Synchronizacja włączona");
+}
 render();
+if(CONFIG.SYNC_URL) setTimeout(syncFromCloud,700);
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 </script>
 </body>
