@@ -32,7 +32,7 @@ h1{font-size:25px;margin:0;font-weight:800;letter-spacing:-.5px}
 .month{min-width:185px;text-align:center;font-size:19px;font-weight:800}
 .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .weekday{height:32px;border-radius:9px;background:#5b6570;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
-.day{min-height:210px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.day{min-height:184px;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03)}
 .day:active{transform:scale(.995)}
 .day.empty{background:transparent;border:0;box-shadow:none;cursor:default}
 .date{height:32px;background:#edf0f3;padding:7px 9px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
@@ -44,7 +44,7 @@ h1{font-size:25px;margin:0;font-weight:800;letter-spacing:-.5px}
 .natalia{background:var(--green);color:#fff}.tomasz{background:var(--blue);color:#fff}.kuba{background:var(--yellow);color:#111}
 .legend{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .legend span{padding:7px 11px;border-radius:9px;font-weight:800;font-size:12px}
-.note{margin-top:9px;color:var(--muted);font-size:11px;text-align:center}.day-note{margin:5px 5px 7px;padding:7px 7px 6px;border-radius:8px;background:#fff7d6;border:1px solid #f0d46a;color:#4d4300;font-size:10px;font-weight:800;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.note-editor{border:1px solid var(--line);border-radius:15px;padding:12px;margin:10px 0}.note-editor textarea{width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;line-height:1.35}.note-actions{display:flex;gap:8px;margin-top:9px}.note-save{flex:1;border:0;border-radius:11px;background:#111827;color:#fff;height:42px;font-weight:800}.note-delete{border:0;border-radius:11px;background:#fbe5e5;color:#b00000;height:42px;padding:0 13px;font-weight:800}
+.summary{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px}.summary-title{font-size:17px;font-weight:900;margin-bottom:10px}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary-person{border:1px solid var(--line);border-radius:11px;padding:10px 9px}.summary-person .name{font-weight:900;font-size:13px}.summary-person .stats{margin-top:5px;font-size:12px;color:var(--muted);font-weight:700}.events-title{font-size:17px;font-weight:900;margin:18px 0 9px}.events-list{display:flex;flex-direction:column;gap:7px}.event-item{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:9px 10px;background:#fff;cursor:pointer}.event-date{min-width:48px;font-weight:900;font-size:12px}.event-text{font-size:12px;font-weight:700;line-height:1.3}.event-empty{color:var(--muted);font-size:12px;font-weight:700;padding:8px 0}.event-icon{font-size:14px}.note{margin-top:9px;color:var(--muted);font-size:11px;text-align:center}.day-note{padding:4px 6px 6px;font-size:9px;color:#5b6570;font-weight:700;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.note-editor{border:1px solid var(--line);border-radius:15px;padding:12px;margin:10px 0}.note-editor textarea{width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;line-height:1.35}.note-actions{display:flex;gap:8px;margin-top:9px}.note-save{flex:1;border:0;border-radius:11px;background:#111827;color:#fff;height:42px;font-weight:800}.note-delete{border:0;border-radius:11px;background:#fbe5e5;color:#b00000;height:42px;padding:0 13px;font-weight:800}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:100;display:none;align-items:flex-end}
 .overlay.show{display:flex}
 .sheet{width:100%;max-height:92vh;background:#fff;border-radius:22px 22px 0 0;padding:12px 16px calc(18px + env(safe-area-inset-bottom));overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
@@ -69,7 +69,7 @@ select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;ba
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:800px){
  .app{padding:8px 6px 24px}
- h1{font-size:21px}.calendar{gap:3px}.weekday{font-size:8px;height:29px}.day{min-height:190px;border-radius:8px}
+ h1{font-size:21px}.calendar{gap:3px}.weekday{font-size:8px;height:29px}.day{min-height:160px;border-radius:8px}
  .date{height:27px;padding:5px 6px;font-size:10px}.person-slot{height:44px;padding:4px 3px 0}.person{height:39px;padding:5px 5px;font-size:8px;border-radius:7px}.person small{font-size:8px;margin-top:2px}
  .month{font-size:17px;min-width:155px}.icon-btn,.today-btn{min-height:40px}.icon-btn{width:40px}
 }
@@ -93,6 +93,12 @@ select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;ba
   </div>
   <div id="calendar" class="calendar"></div>
   <div class="legend"><span class="natalia">Natalia</span><span class="tomasz">Tomasz</span><span class="kuba">Kuba</span></div>
+  <section class="summary">
+    <div class="summary-title">📊 PODSUMOWANIE <span id="summaryMonth"></span></div>
+    <div id="summaryGrid" class="summary-grid"></div>
+    <div class="events-title">📝 NOTATKI I WYDARZENIA</div>
+    <div id="eventsList" class="events-list"></div>
+  </section>
   <div class="note">Kliknij dowolny dzień, aby dodać, zmienić lub usunąć dyżur. Zmiany zapisują się na tym iPhonie.</div>
 </div>
 
@@ -218,17 +224,44 @@ function render(){
     }
     cell.appendChild(slot);
   });
-
-  // Daily note: visible directly in the calendar for everyone.
-  if(notes[iso]){
-    const note=document.createElement("div");
-    note.className="day-note";
-    note.textContent="📝 "+notes[iso];
-    cell.appendChild(note);
-  }
-
   cal.appendChild(cell);
  }
+}
+
+function shiftHours(range){
+  if(!range) return 0;
+  const p=range.split("–");
+  if(p.length!==2) return 0;
+  const a=p[0].split(":").map(Number), b=p[1].split(":").map(Number);
+  let start=a[0]*60+a[1], end=b[0]*60+b[1];
+  if(end<=start) end+=1440;
+  return (end-start)/60;
+}
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+function renderSummary(){
+  const y=cur.getFullYear(),m=cur.getMonth();
+  document.getElementById("summaryMonth").textContent=`— ${M[m]} ${y}`;
+  const totals={Tomasz:{shifts:0,hours:0},Natalia:{shifts:0,hours:0},Kuba:{shifts:0,hours:0}};
+  const last=new Date(y,m+1,0).getDate();
+  for(let d=1;d<=last;d++){
+    getPeople(isoOf(y,m,d)).forEach(([name,h])=>{
+      if(totals[name]){totals[name].shifts++;totals[name].hours+=shiftHours(h);}
+    });
+  }
+  document.getElementById("summaryGrid").innerHTML=people.map(name=>{
+    const t=totals[name],h=Number.isInteger(t.hours)?t.hours:t.hours.toFixed(1);
+    return `<div class="summary-person"><div class="name ${cls[name]}">${name}</div><div class="stats">${t.shifts} ${t.shifts===1?"zmiana":"zmian"} · ${h} h</div></div>`;
+  }).join("");
+
+  const prefix=`${y}-${String(m+1).padStart(2,"0")}-`;
+  const dates=Object.keys(notes).filter(x=>x.startsWith(prefix)).sort();
+  const list=document.getElementById("eventsList");
+  list.innerHTML=dates.length ? dates.map(iso=>{
+    const day=iso.slice(8,10);
+    return `<div class="event-item" onclick="openDay('${iso}')"><div class="event-date">${day}.${String(m+1).padStart(2,"0")}</div><div class="event-icon">📝</div><div class="event-text">${escapeHtml(notes[iso])}</div></div>`;
+  }).join("") : '<div class="event-empty">Brak zapisanych notatek i wydarzeń w tym miesiącu.</div>';
 }
 function move(n){cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);render();}
 function goToday(){const t=new Date();cur=new Date(t.getFullYear(),t.getMonth(),1);render();showToast("Przejście do bieżącego miesiąca");}
@@ -272,21 +305,13 @@ function deletePerson(name){
  saveOverrides();render();openDay(editingIso);showToast(`${name}: usunięto`);
 }
 function saveNote(){
-  const iso=editingIso;
   const value=document.getElementById("dayNote").value.trim();
-  if(value) notes[iso]=value; else delete notes[iso];
-  saveCloudState();
-  render();
-  openDay(iso);
-  showToast(value?"Notatka zapisana":"Notatka usunięta");
+  if(value) notes[editingIso]=value; else delete notes[editingIso];
+  saveCloudState(); render(); openDay(editingIso); showToast(value?"Notatka zapisana":"Notatka usunięta");
 }
 function deleteNote(){
-  const iso=editingIso;
-  delete notes[iso];
-  saveCloudState();
-  render();
-  openDay(iso);
-  showToast("Notatka usunięta");
+  delete notes[editingIso];
+  saveCloudState(); render(); openDay(editingIso); showToast("Notatka usunięta");
 }
 function closeSheet(){document.getElementById("overlay").classList.remove("show");editingIso=null;}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),1600);}
